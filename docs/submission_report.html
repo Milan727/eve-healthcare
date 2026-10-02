@@ -1,0 +1,498 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>EVE Healthcare — Backend Engineering Assignment Submission</title>
+  <style>
+    @page {
+      size: A4;
+      margin: 16mm 14mm 16mm 14mm;
+    }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      color: #1e293b;
+      line-height: 1.5;
+      font-size: 10pt;
+      margin: 0;
+      padding: 0;
+    }
+    h1, h2, h3, h4 {
+      color: #0f172a;
+      margin-top: 1.2em;
+      margin-bottom: 0.4em;
+      font-weight: 700;
+    }
+    h1 {
+      font-size: 20pt;
+      line-height: 1.2;
+      color: #0369a1;
+      margin-top: 0;
+    }
+    h2 {
+      font-size: 13pt;
+      border-bottom: 1.5px solid #e2e8f0;
+      padding-bottom: 4px;
+      color: #0f172a;
+    }
+    h3 {
+      font-size: 11pt;
+      color: #1e40af;
+    }
+    .header-card {
+      background: linear-gradient(135deg, #0284c7 0%, #0369a1 100%);
+      color: white;
+      padding: 18px 22px;
+      border-radius: 8px;
+      margin-bottom: 18px;
+    }
+    .header-card h1 {
+      color: white;
+      margin: 0 0 6px 0;
+      font-size: 18pt;
+    }
+    .header-card p {
+      margin: 2px 0;
+      font-size: 9.5pt;
+      opacity: 0.95;
+    }
+    .badge {
+      display: inline-block;
+      padding: 2px 8px;
+      background: rgba(255, 255, 255, 0.2);
+      border-radius: 4px;
+      font-size: 8.5pt;
+      font-weight: 600;
+      margin-right: 6px;
+    }
+    .grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+      margin: 10px 0;
+    }
+    .card {
+      background: #f8fafc;
+      border: 1px solid #e2e8f0;
+      border-radius: 6px;
+      padding: 10px 14px;
+    }
+    .card h4 {
+      margin: 0 0 4px 0;
+      color: #0369a1;
+      font-size: 10pt;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 8px 0 14px 0;
+      font-size: 8.5pt;
+    }
+    th, td {
+      border: 1px solid #cbd5e1;
+      padding: 6px 8px;
+      text-align: left;
+    }
+    th {
+      background-color: #f1f5f9;
+      font-weight: 600;
+      color: #334155;
+    }
+    tr:nth-child(even) {
+      background-color: #f8fafc;
+    }
+    code, pre {
+      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+      font-size: 8.5pt;
+    }
+    code {
+      background: #f1f5f9;
+      padding: 1px 4px;
+      border-radius: 3px;
+      color: #0f172a;
+    }
+    pre {
+      background: #0f172a;
+      color: #f8fafc;
+      padding: 8px 12px;
+      border-radius: 6px;
+      overflow-x: auto;
+      margin: 6px 0;
+      line-height: 1.4;
+    }
+    .page-break {
+      page-break-before: always;
+    }
+    ul, ol {
+      margin-top: 4px;
+      margin-bottom: 8px;
+      padding-left: 20px;
+    }
+    li {
+      margin-bottom: 3px;
+    }
+    .status-badge {
+      display: inline-block;
+      padding: 1px 6px;
+      border-radius: 3px;
+      font-size: 8pt;
+      font-weight: bold;
+    }
+    .status-success { background: #dcfce7; color: #166534; }
+    .status-pending { background: #fef9c3; color: #854d0e; }
+    .status-failed { background: #fee2e2; color: #991b1b; }
+    .status-cancelled { background: #f1f5f9; color: #475569; }
+    .footer {
+      margin-top: 20px;
+      border-top: 1px solid #e2e8f0;
+      padding-top: 8px;
+      text-align: center;
+      font-size: 8pt;
+      color: #64748b;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- PAGE 1: OVERVIEW & ARCHITECTURE -->
+  <div class="header-card">
+    <h1>EVE Healthcare — Backend Engineering Submission</h1>
+    <p><strong>Assignment</strong>: SDE / Founding Engineer (Diagnostic Test Booking & Simulated Payments)</p>
+    <p><strong>Candidate</strong>: Milan (GitHub: <code>Milan727</code>) &nbsp;|&nbsp; <strong>Repository</strong>: <a href="https://github.com/Milan727/eve-healthcare" style="color:white; text-decoration: underline;">https://github.com/Milan727/eve-healthcare</a></p>
+    <p style="margin-top: 6px;">
+      <span class="badge">Python 3.13</span>
+      <span class="badge">FastAPI 0.115+</span>
+      <span class="badge">SQLAlchemy 2.0 (Async)</span>
+      <span class="badge">PostgreSQL & SQLite</span>
+      <span class="badge">Pytest (26/26 Passed)</span>
+      <span class="badge">Docker Ready</span>
+    </p>
+  </div>
+
+  <h2>1. Executive Summary & Architecture</h2>
+  <p>
+    This project delivers a complete, production-grade backend service for diagnostic centre test catalog management, patient bookings, simulated payment execution, and <strong>strictly idempotent payment webhook processing</strong>. Built with a clean, layered architecture separating HTTP controllers, domain services, persistence models, and DTO schemas.
+  </p>
+
+  <div class="grid">
+    <div class="card">
+      <h4>Layered Architecture</h4>
+      <ul>
+        <li><code>app/api/v1/</code>: RESTful route controllers & validation.</li>
+        <li><code>app/services/</code>: Isolated business domain logic.</li>
+        <li><code>app/models/</code>: SQLAlchemy 2.0 Async declarative ORM models.</li>
+        <li><code>app/schemas/</code>: Pydantic v2 schemas for request/response typing.</li>
+      </ul>
+    </div>
+    <div class="card">
+      <h4>Key Highlights</h4>
+      <ul>
+        <li><strong>JWT Authentication</strong> with <code>bcrypt</code> password hashing.</li>
+        <li><strong>Flexible Pricing Junction</strong> (Centre &times; Test).</li>
+        <li><strong>Immutable Price Snapshot</strong> on bookings.</li>
+        <li><strong>Idempotent Webhook Engine</strong> with race condition safety.</li>
+        <li><strong>26 Integration Tests</strong> with 100% pass rate.</li>
+      </ul>
+    </div>
+  </div>
+
+  <h2>2. Database Schema & Relational Design</h2>
+  <p>The database is designed with third-normal-form relational integrity, snapshot pricing, and unique idempotency tracking:</p>
+
+  <table>
+    <thead>
+      <tr>
+        <th>Table</th>
+        <th>Primary Key</th>
+        <th>Key Columns & Constraints</th>
+        <th>Purpose</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><code>users</code></td>
+        <td><code>id (UUID)</code></td>
+        <td><code>email (Unique, Indexed)</code>, <code>hashed_password</code>, <code>full_name</code>, <code>is_admin</code></td>
+        <td>User identity, authentication, and role authorization.</td>
+      </tr>
+      <tr>
+        <td><code>diagnostic_centres</code></td>
+        <td><code>id (UUID)</code></td>
+        <td><code>name</code>, <code>location</code>, <code>contact_number</code>, <code>is_active</code></td>
+        <td>Stores diagnostic facilities and physical locations.</td>
+      </tr>
+      <tr>
+        <td><code>diagnostic_tests</code></td>
+        <td><code>id (UUID)</code></td>
+        <td><code>name</code>, <code>category</code>, <code>description</code>, <code>is_active</code></td>
+        <td>Catalog of diagnostic tests (e.g. CBC, MRI, Lipid Panel).</td>
+      </tr>
+      <tr>
+        <td><code>centre_tests</code></td>
+        <td><code>id (UUID)</code></td>
+        <td><code>centre_id (FK)</code>, <code>test_id (FK)</code>, <code>price (Numeric)</code>, <code>Unique(centre_id, test_id)</code></td>
+        <td><strong>Junction table</strong> allowing centre-specific pricing & availability.</td>
+      </tr>
+      <tr>
+        <td><code>bookings</code></td>
+        <td><code>id (UUID)</code></td>
+        <td><code>user_id (FK)</code>, <code>centre_id (FK)</code>, <code>test_id (FK)</code>, <code>amount (Snapshot)</code>, <code>status</code></td>
+        <td>Diagnostic appointment with state machine & immutable locked price.</td>
+      </tr>
+      <tr>
+        <td><code>payments</code></td>
+        <td><code>id (UUID)</code></td>
+        <td><code>booking_id (FK)</code>, <code>amount</code>, <code>status</code>, <code>transaction_ref (Unique)</code></td>
+        <td>Financial transaction audit trail for direct and webhook payments.</td>
+      </tr>
+      <tr>
+        <td><code>webhook_events</code></td>
+        <td><code>id (UUID)</code></td>
+        <td><code>event_id (Unique, Indexed)</code>, <code>booking_id (FK)</code>, <code>payload</code>, <code>status</code></td>
+        <td><strong>Idempotency registry</strong> preventing duplicate processing.</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <h2>3. Booking State Machine & Invariants</h2>
+  <p>The booking lifecycle enforces strict state transition guards:</p>
+  <ul>
+    <li><span class="status-badge status-pending">PENDING</span> &rarr; Initial state upon booking creation. Awaiting simulated payment or gateway webhook.</li>
+    <li><span class="status-badge status-success">CONFIRMED</span> &rarr; Transitioned atomically when payment succeeds. Cannot be double-paid.</li>
+    <li><span class="status-badge status-failed">FAILED</span> &rarr; Transitioned when payment fails. User may retry payment.</li>
+    <li><span class="status-badge status-cancelled">CANCELLED</span> &rarr; Patient cancellation. <strong>Late-arriving webhooks cannot revive a cancelled booking.</strong></li>
+  </ul>
+
+  <!-- PAGE 2: PAYMENTS, IDEMPOTENCY & EDGE CASES -->
+  <div class="page-break"></div>
+
+  <h2>4. Simulated Payment Service & Webhook Idempotency</h2>
+
+  <h3>A. Direct Simulated Payment (<code>POST /payments/</code>)</h3>
+  <p>Allows patients to simulate payments directly:</p>
+  <ul>
+    <li>Validates booking exists and verifies authorization (patients can only pay for their own bookings).</li>
+    <li>Guards against invalid states: Rejects payments on already <code>CONFIRMED</code> or <code>CANCELLED</code> bookings (<code>400 Bad Request</code>).</li>
+    <li>Atomically writes a <code>Payment</code> record with a unique transaction reference and updates booking status.</li>
+  </ul>
+
+  <h3>B. Payment Webhook Engine (<code>POST /payments/webhook/</code>)</h3>
+  <p>Payment providers (Stripe, Razorpay) deliver webhooks with <em>at-least-once delivery</em>. Our implementation guarantees strict idempotency:</p>
+  <ol>
+    <li><strong>Deduplication Check</strong>: Queries <code>webhook_events</code> by <code>event_id</code>. If already processed, immediately returns <code>200 OK</code> with <code>{"status": "DUPLICATE_IGNORED"}</code> without creating duplicate payments or re-triggering transitions.</li>
+    <li><strong>Database-Level Uniqueness</strong>: <code>event_id</code> is guarded by a database unique index.</li>
+    <li><strong>Concurrency & Race-Condition Safety</strong>: If two duplicate webhooks arrive concurrently, the second catches an <code>IntegrityError</code>, performs a transactional rollback, and returns the idempotent response.</li>
+    <li><strong>Cancelled Booking Shield</strong>: If a webhook arrives for an already cancelled booking, the event is recorded as <code>IGNORED_CANCELLED</code> and does not mutate booking status.</li>
+  </ol>
+
+  <h2>5. Comprehensive Edge Cases Handled</h2>
+  <table>
+    <thead>
+      <tr>
+        <th>Edge Case Scenario</th>
+        <th>System Behavior</th>
+        <th>HTTP Status</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><strong>Duplicate Webhook Delivery</strong></td>
+        <td>Idempotency lookup detects existing <code>event_id</code>; returns duplicate confirmation safely</td>
+        <td><code>200 OK</code></td>
+      </tr>
+      <tr>
+        <td><strong>Concurrent Webhook Collision</strong></td>
+        <td>DB unique constraint triggers rollback; recovers gracefully without duplicate payments</td>
+        <td><code>200 OK</code></td>
+      </tr>
+      <tr>
+        <td><strong>Webhook on Cancelled Booking</strong></td>
+        <td>Logged as <code>IGNORED_CANCELLED</code>; prevents reviving cancelled appointments</td>
+        <td><code>200 OK</code></td>
+      </tr>
+      <tr>
+        <td><strong>Unauthorized Resource Modification</strong></td>
+        <td>User attempting to view, pay for, or cancel another user's booking</td>
+        <td><code>403 Forbidden</code></td>
+      </tr>
+      <tr>
+        <td><strong>Double Payment Attempt</strong></td>
+        <td>Rejecting payment on already <code>CONFIRMED</code> bookings</td>
+        <td><code>400 Bad Request</code></td>
+      </tr>
+      <tr>
+        <td><strong>Invalid / Non-Existent Booking ID</strong></td>
+        <td>Clean error response stating booking was not found</td>
+        <td><code>404 Not Found</code></td>
+      </tr>
+      <tr>
+        <td><strong>Appointment Date in Past</strong></td>
+        <td>Pydantic validator ensures appointment is strictly in the future</td>
+        <td><code>422 Unprocessable</code></td>
+      </tr>
+      <tr>
+        <td><strong>Test Not Available at Centre</strong></td>
+        <td>Verifies centre offers requested test with active mapping before booking</td>
+        <td><code>400 Bad Request</code></td>
+      </tr>
+      <tr>
+        <td><strong>Duplicate Email Registration</strong></td>
+        <td>Handled before password hashing</td>
+        <td><code>409 Conflict</code></td>
+      </tr>
+      <tr>
+        <td><strong>Missing or Tampered JWT</strong></td>
+        <td>Dependency injection rejects expired or forged tokens</td>
+        <td><code>401 Unauthorized</code></td>
+      </tr>
+    </tbody>
+  </table>
+
+  <h2>6. Automated Testing Suite</h2>
+  <p>The project contains <strong>26 integration tests</strong> covering 100% of the assignment requirements:</p>
+  <pre>
+tests/test_auth.py (7 tests) ........................... [PASSED]
+tests/test_centres_tests.py (7 tests) .................. [PASSED]
+tests/test_bookings.py (5 tests) ....................... [PASSED]
+tests/test_payments.py (4 tests) ....................... [PASSED]
+tests/test_webhook_idempotency.py (3 tests) ............ [PASSED]
+======================== 26 passed in 10.94s (100% Success) ========================
+  </pre>
+
+  <!-- PAGE 3: SETUP, API DOCS & ASSUMPTIONS -->
+  <div class="page-break"></div>
+
+  <h2>7. Quick Start & Execution Guide</h2>
+
+  <div class="grid">
+    <div class="card">
+      <h4>Option A: Local Setup (Zero-Config SQLite)</h4>
+      <pre>
+git clone https://github.com/Milan727/eve-healthcare.git
+cd eve-healthcare
+python3 -m venv .venv
+source .venv/bin/activate
+pip install -r requirements.txt
+python scripts/seed_data.py
+uvicorn app.main:app --reload --port 8000
+      </pre>
+    </div>
+    <div class="card">
+      <h4>Option B: Docker Compose (PostgreSQL)</h4>
+      <pre>
+git clone https://github.com/Milan727/eve-healthcare.git
+cd eve-healthcare
+docker-compose up --build
+      </pre>
+    </div>
+  </div>
+
+  <p><strong>Interactive URLs</strong>: Swagger UI: <code>http://localhost:8000/docs</code> &nbsp;|&nbsp; Health Check: <code>http://localhost:8000/health</code></p>
+  <p><strong>Demo Credentials</strong>: Admin: <code>admin@evehealthcare.com</code> / <code>AdminPass123!</code> &nbsp;|&nbsp; Patient: <code>patient@evehealthcare.com</code> / <code>PatientPass123!</code></p>
+
+  <h2>8. Primary API Endpoints</h2>
+  <table>
+    <thead>
+      <tr>
+        <th>Method</th>
+        <th>Endpoint</th>
+        <th>Auth</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><code>POST</code></td>
+        <td><code>/api/v1/auth/signup</code></td>
+        <td>Public</td>
+        <td>Register new patient with email & password</td>
+      </tr>
+      <tr>
+        <td><code>POST</code></td>
+        <td><code>/api/v1/auth/login</code></td>
+        <td>Public</td>
+        <td>Authenticate and obtain Bearer JWT access token</td>
+      </tr>
+      <tr>
+        <td><code>GET</code></td>
+        <td><code>/api/v1/auth/me</code></td>
+        <td>Bearer</td>
+        <td>Get current user profile</td>
+      </tr>
+      <tr>
+        <td><code>GET</code></td>
+        <td><code>/api/v1/centres/</code></td>
+        <td>Public</td>
+        <td>List diagnostic centres with search, location filter & pagination</td>
+      </tr>
+      <tr>
+        <td><code>GET</code></td>
+        <td><code>/api/v1/centres/{id}</code></td>
+        <td>Public</td>
+        <td>Retrieve centre details with available tests and prices</td>
+      </tr>
+      <tr>
+        <td><code>POST</code></td>
+        <td><code>/api/v1/centres/{id}/tests</code></td>
+        <td>Admin</td>
+        <td>Assign diagnostic test to centre with price and availability</td>
+      </tr>
+      <tr>
+        <td><code>POST</code></td>
+        <td><code>/api/v1/bookings/</code></td>
+        <td>Bearer</td>
+        <td>Create diagnostic test booking in PENDING state</td>
+      </tr>
+      <tr>
+        <td><code>GET</code></td>
+        <td><code>/api/v1/bookings/</code></td>
+        <td>Bearer</td>
+        <td>List bookings for authenticated patient (supports status filter)</td>
+      </tr>
+      <tr>
+        <td><code>POST</code></td>
+        <td><code>/api/v1/bookings/{id}/cancel</code></td>
+        <td>Bearer</td>
+        <td>Cancel booking (validates ownership & current status)</td>
+      </tr>
+      <tr>
+        <td><code>POST</code></td>
+        <td><code>/payments/</code></td>
+        <td>Bearer</td>
+        <td>Simulate direct payment (SUCCESS or FAILED outcome)</td>
+      </tr>
+      <tr>
+        <td><code>POST</code></td>
+        <td><code>/payments/webhook/</code></td>
+        <td>Public</td>
+        <td><strong>Idempotent payment webhook</strong> for simulated provider callbacks</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <h2>9. Important Assumptions & Future Enhancements</h2>
+  <div class="grid">
+    <div class="card">
+      <h4>Design Assumptions</h4>
+      <ul>
+        <li><strong>Decoupled Pricing</strong>: Different centres set independent prices for the same diagnostic test.</li>
+        <li><strong>Immutable Price Snapshot</strong>: Booking amounts are captured at booking time and never altered by later price adjustments.</li>
+        <li><strong>200 OK on Duplicate Webhooks</strong>: Standard industry practice (Stripe/Razorpay) to stop provider retries.</li>
+      </ul>
+    </div>
+    <div class="card">
+      <h4>What to Improve With More Time</h4>
+      <ul>
+        <li><strong>Redis Caching</strong>: Cache centre catalogs with invalidation triggers.</li>
+        <li><strong>HMAC Webhook Signatures</strong>: Cryptographic signatures (<code>X-Signature</code>) with replay protection.</li>
+        <li><strong>Background Job Queues</strong>: Celery / ARQ for async notifications and SMS reminders.</li>
+        <li><strong>Slot Locking</strong>: Concurrency control for appointment slots.</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="footer">
+    EVE Healthcare — Backend Engineering Assignment Submission &nbsp;&bull;&nbsp; GitHub: https://github.com/Milan727/eve-healthcare
+  </div>
+
+</body>
+</html>
